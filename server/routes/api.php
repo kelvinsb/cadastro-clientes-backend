@@ -21,3 +21,4 @@ Route::get('sexo', 'SexoController@index');
 Route::post('cliente', 'ClienteController@criar');
 Route::get('cliente', 'ClienteController@listar');
 Route::delete('cliente/{id}', 'ClienteController@deletar');
+Route::put('cliente/{id}', 'ClienteController@editar');
