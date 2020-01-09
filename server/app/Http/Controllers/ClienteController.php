@@ -138,4 +138,31 @@ class ClienteController extends Controller
         return response('', 200);
 
     }
+
+    public function exibir(Request $request, $id)
+    {
+        $itens = DB::table('clientes as cli')
+                    ->join('sexos as sex', 'cli.sexo_id', '=', 'sex.id')
+                    ->join('enderecos as end', 'cli.endereco_id', '=', 'end.id')
+                    ->join('endereco_ceps as end_cep', 'end.endereco_banco_id', '=', 'end_cep.id')
+                    ->select(
+                        'cli.id as id',
+                        'cli.nome as nome',
+                        'cli.data_nascimento as data_nascimento',
+                        'sex.descricao as sexo',
+                        'end_cep.cep as cep',
+                        'end_cep.logradouro as logradouro',
+                        'end.complemento as complemento',
+                        'end.numero as numero',
+                        'end_cep.bairro as bairro',
+                        'end_cep.cidade as cidade',
+                        'end_cep.estado as estado'
+                    )
+                    ->whereNull('cli.excluded_on')
+                    ->where('cli.id', '=', $id)
+                    ->get();
+        return response()->json([
+            "resultado"     =>  $itens
+        ], 200);
+    }
 }
