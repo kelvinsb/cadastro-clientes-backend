@@ -19,3 +19,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('sexo', 'SexoController@index');
 Route::post('cliente', 'ClienteController@criar');
+Route::get('cliente', 'ClienteController@listar');
