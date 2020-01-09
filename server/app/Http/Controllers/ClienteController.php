@@ -89,4 +89,18 @@ class ClienteController extends Controller
         ], 200);
 
     }
+
+    public function deletar(Request $request, $id)
+    {
+        $item = Cliente::findOrFail($id);
+        if (!$item) {
+            return response('', 404);
+        }
+        $item->excluded_on = DB::raw('now()');
+        $endereco = Endereco::findOrFail($item->endereco_id);
+        $endereco->excluded_on = DB::raw('now()');
+        $item->save();
+        $endereco->save();
+        return response('', 200);
+    }
 }
