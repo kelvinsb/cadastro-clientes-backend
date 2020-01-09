@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Cliente;
 use App\Sexo;
 use App\Endereco;
+use App\EnderecoCep;
 
 use DB;
 
@@ -102,5 +103,39 @@ class ClienteController extends Controller
         $item->save();
         $endereco->save();
         return response('', 200);
+    }
+
+    public function editar(Request $request, $id)
+    {
+        $item = Cliente::findOrFail($id);
+        if (!$item) {
+            return response('', 404);
+        }
+
+        $item->nome = $request->nome;
+        $item->data_nascimento = $request->data_nascimento;
+        $item->sexo_id = $request->sexo_id;
+
+        $endereco = Endereco::findOrFail($item->endereco_id);
+        if ($endereco) {
+            $endereco->numero = $request->endereco['numero'];
+            $endereco->complemento = $request->endereco['complemento'];
+
+            $enderecoCepController = new EnderecoCepController();
+            $objetoEnderecoCep = (object) $request->endereco['endereco_cep'];
+            $enderecoCep = $enderecoCepController->procurarPorCep($objetoEnderecoCep->cep);
+            
+            if ($enderecoCep !== $objetoEnderecoCep->cep) {
+                $enderecoCepCriar = $enderecoCepController->criarEnderecoCep(($objetoEnderecoCep));
+                if ($enderecoCepCriar->exists()) {
+                    $endereco->endereco_banco_id = $enderecoCepCriar->id;
+                }
+            }
+            $endereco->save();
+        }
+        $item->save();
+
+        return response('', 200);
+
     }
 }
