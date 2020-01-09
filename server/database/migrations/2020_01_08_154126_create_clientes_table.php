@@ -18,7 +18,7 @@ class CreateClientesTable extends Migration
             $table->string('nome', 80);
             $table->date('data_nascimento');
             $table->unsignedInteger('sexo_id');
-            $table->unsignedInteger('endereco_id');
+            $table->unsignedInteger('endereco_id')->nullable();
             $table->foreign('sexo_id')->references('id')->on('sexos');
             $table->foreign('endereco_id')->references('id')->on('enderecos');
             $table->timestamps();

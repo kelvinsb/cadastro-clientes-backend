@@ -15,11 +15,11 @@ class CreateEnderecoCepsTable extends Migration
     {
         Schema::create('endereco_ceps', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('cep', 12);
-            $table->string('logradouro', 40);
-            $table->string('bairro', 40);
-            $table->string('cidade', 40);
-            $table->string('estado', 40);
+            $table->string('cep', 12)->nullable();
+            $table->string('logradouro', 40)->nullable();
+            $table->string('bairro', 40)->nullable();
+            $table->string('cidade', 40)->nullable();
+            $table->string('estado', 40)->nullable();
             $table->timestamps();
             $table->timestamp('excluded_on', 0)->nullable();
         });
