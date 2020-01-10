@@ -8,6 +8,7 @@ use App\Cliente;
 use App\Sexo;
 use App\Endereco;
 use App\EnderecoCep;
+use \Illuminate\Support\Facades\Validator;
 
 use DB;
 
@@ -15,6 +16,28 @@ class ClienteController extends Controller
 {
     public function criar(Request $request)
     {
+        $validacao = Validator::make($request->json()->all(), [
+            'nome'  =>  'required|string|min:4|max:80',
+            'data_nascimento'  =>  'required|date',
+            'sexo_id'  =>  'required|integer|min:1',
+            'endereco.numero'  =>  'string|min:1|max:10',
+            'endereco.complemento'  =>  'string|min:4|max:40',
+            'endereco.endereco_cep.cep'  =>  'string|min:8|max:12',
+            'endereco.endereco_cep.logradouro'  =>  'string|min:5|max:40',
+            'endereco.endereco_cep.bairro'  =>  'string|min:5|max:40',
+            'endereco.endereco_cep.cidade'  =>  'string|min:5|max:40',
+            'endereco.endereco_cep.estado'  =>  'string|min:2|max:40',
+        ]);
+        if ($validacao->fails()) {
+            $mensagens = [];
+            foreach ($validacao->errors()->getMessages() as $item) {
+                array_push($mensagens, $item);
+            }
+            return response()->json(
+                $mensagens, 500
+            );
+        }
+
         $cliente = new Cliente();
         $cliente->nome = $request->nome;
         $cliente->data_nascimento = $request->data_nascimento;
@@ -112,6 +135,27 @@ class ClienteController extends Controller
 
     public function editar(Request $request, $id)
     {
+        $validacao = Validator::make($request->json()->all(), [
+            'nome'  =>  'required|string|min:4|max:80',
+            'data_nascimento'  =>  'required|date',
+            'sexo_id'  =>  'required|integer|min:1',
+            'endereco.numero'  =>  'string|min:1|max:10',
+            'endereco.complemento'  =>  'string|min:4|max:40',
+            'endereco.endereco_cep.cep'  =>  'string|min:8|max:12',
+            'endereco.endereco_cep.logradouro'  =>  'string|min:5|max:40',
+            'endereco.endereco_cep.bairro'  =>  'string|min:5|max:40',
+            'endereco.endereco_cep.cidade'  =>  'string|min:5|max:40',
+            'endereco.endereco_cep.estado'  =>  'string|min:2|max:40',
+        ]);
+        if ($validacao->fails()) {
+            $mensagens = [];
+            foreach ($validacao->errors()->getMessages() as $item) {
+                array_push($mensagens, $item);
+            }
+            return response()->json(
+                $mensagens, 500
+            );
+        }
         $item = Cliente::findOrFail($id);
         if (!$item) {
             return response('', 404);
