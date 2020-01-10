@@ -15,21 +15,10 @@ class ClienteController extends Controller
 {
     public function criar(Request $request)
     {
-        // EnderecoCep
-        $enderecoCepController = new EnderecoCepController();
-        $objetoEnderecoCep = (object) $request->endereco['endereco_cep'];
-        $enderecoCep = $enderecoCepController->procurarPorCep($objetoEnderecoCep->cep);
-        if(!$enderecoCep) {
-            $enderecoCep = $enderecoCepController->criarEnderecoCep(($objetoEnderecoCep));
-        }
+        $cliente = new Cliente();
+        $cliente->nome = $request->nome;
+        $cliente->data_nascimento = $request->data_nascimento;
 
-        // Endereco
-        $enderecoController = new EnderecoController();
-        $endereco = $enderecoController->criarEndereco(
-            $request->endereco['numero'],
-            $request->endereco['complemento'],
-            $enderecoCep->id
-        );
 
         // Sexo
         $erroSexo = response()->json([
@@ -39,13 +28,29 @@ class ClienteController extends Controller
         if (!$sexo) {
             return $erroSexo;
         }
+        $cliente->sexo_id = $sexo->id;
 
-        $cliente = new Cliente([
-            'nome' =>  $request->nome,
-            'data_nascimento' =>  $request->data_nascimento,
-            'sexo_id' =>  $sexo->id,
-            'endereco_id' =>  $endereco->id
-        ]);
+        if ($request->endereco && $request->endereco['endereco_cep']) {
+            // EnderecoCep
+            $enderecoCepController = new EnderecoCepController();
+            $objetoEnderecoCep = (object) $request->endereco['endereco_cep'];
+            $enderecoCep = $enderecoCepController->procurarPorCep($objetoEnderecoCep->cep);
+            if(!$enderecoCep) {
+                $enderecoCep = $enderecoCepController->criarEnderecoCep(($objetoEnderecoCep));
+            }
+        }
+
+        if ($request->endereco) {
+            // Endereco
+            $enderecoController = new EnderecoController();
+            $endereco = $enderecoController->criarEndereco(
+                $request->endereco['numero'],
+                $request->endereco['complemento'],
+                $enderecoCep->id
+            );
+            $cliente->endereco_id = $endereco->id;
+        }
+
         $cliente->save();
         if(!$cliente->exists())
         {
@@ -150,6 +155,7 @@ class ClienteController extends Controller
                         'cli.nome as nome',
                         'cli.data_nascimento as data_nascimento',
                         'sex.descricao as sexo',
+                        'sex.id as sexo_id',
                         'end_cep.cep as cep',
                         'end_cep.logradouro as logradouro',
                         'end.complemento as complemento',
